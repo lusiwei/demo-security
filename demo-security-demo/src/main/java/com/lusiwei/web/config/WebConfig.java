@@ -17,7 +17,7 @@ import java.util.List;
  * @Date: 2019/1/20 20:25
  * @Description:
  */
-@Configuration
+//@Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
     @Autowired
     private TimeInterceptor timeInterceptor;

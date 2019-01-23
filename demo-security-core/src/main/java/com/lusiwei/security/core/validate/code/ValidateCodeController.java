@@ -1,20 +1,14 @@
 package com.lusiwei.security.core.validate.code;
 
-import com.lusiwei.security.core.properties.ImageCodeProperties;
-import com.lusiwei.security.core.properties.SecurityProperties;
-import com.wf.captcha.Captcha;
-import com.wf.captcha.GifCaptcha;
-import com.wf.captcha.utils.CaptchaUtil;
-import org.apache.catalina.util.RequestUtil;
+import com.lusiwei.security.core.validate.code.sms.SmsCodeSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.io.IOException;
 
 /**
  * @Author: lusiwei
@@ -24,32 +18,24 @@ import java.io.IOException;
 @RestController
 public class ValidateCodeController {
     @Autowired
-    private SecurityProperties securityProperties;
+    private ImageCodeGenerator imageCodeGenerator;
+    @Autowired
+    private ValidateCodeGenerator smsCodeGenerator;
+
+    @Autowired
+    private SmsCodeSender smsCodeSender;
+
     @GetMapping("/code/image")
-    public void createCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //设置请求头为输出图片类型
-        CaptchaUtil.setHeader(response);
-        // 三个参数分别为宽、高、位数
-        ImageCodeProperties image = securityProperties.getCode().getImage();
-        int width= image.getWidth();
-        int height= image.getHeight();
-        int length= image.getLength();
-        int expireIn = image.getExpireIn();
-        width=ServletRequestUtils.getIntParameter(request,"width",width);
-        height=ServletRequestUtils.getIntParameter(request, "height", height);
-        GifCaptcha gifCaptcha = new GifCaptcha(width,height,length);
-
-        // 设置字体
-        gifCaptcha.setFont(new Font("Verdana", Font.PLAIN, 32));
-
-        // 设置类型，纯数字、纯字母、字母数字混合
-        gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
-
-        // 验证码存入session
-        request.getSession().setAttribute("captcha", new ImageCode(gifCaptcha.text().toLowerCase(),expireIn));
-
-        // 输出图片流
-        gifCaptcha.out(response.getOutputStream());
+    public void createImageCode(HttpServletRequest request, HttpServletResponse response){
+        ImageCode imageCode = (ImageCode) imageCodeGenerator.generateCode(request, response);
+        request.getSession().setAttribute("captcha_image",imageCode);
+        imageCodeGenerator.out(response);
     }
-
+    @GetMapping("/code/sms")
+    public void createSmsCode(HttpServletRequest request, HttpServletResponse response) throws ServletRequestBindingException {
+        ValidateCode smsCode = smsCodeGenerator.generateCode(request, response);
+        request.getSession().setAttribute("captcha_sms",smsCode);
+        String mobile = ServletRequestUtils.getRequiredStringParameter(request, "mobile");
+        smsCodeSender.send(mobile,smsCode.getCode());
+    }
 }

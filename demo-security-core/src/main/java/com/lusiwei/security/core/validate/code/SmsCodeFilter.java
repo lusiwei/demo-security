@@ -5,7 +5,6 @@ import com.wf.captcha.utils.CaptchaUtil;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,22 +24,22 @@ import java.util.Set;
  * @Description:
  */
 @Setter
-public class ValidateCodeFilter extends OncePerRequestFilter implements InitializingBean {
+public class SmsCodeFilter extends OncePerRequestFilter implements InitializingBean {
     private AuthenticationFailureHandler authenticationFailureHandler;
     private Set<String> urls = new HashSet<>();
     private SecurityProperties securityProperties;
-    private AntPathMatcher antPathMatcher=new AntPathMatcher();
+    private AntPathMatcher antPathMatcher = new AntPathMatcher();
 
-    public ValidateCodeFilter(AuthenticationFailureHandler authenticationFailureHandler) {
+    public SmsCodeFilter(AuthenticationFailureHandler authenticationFailureHandler) {
         this.authenticationFailureHandler = authenticationFailureHandler;
     }
 
     @Override
     public void afterPropertiesSet() throws ServletException {
         super.afterPropertiesSet();
-        String[] strings = StringUtils.splitByWholeSeparatorPreserveAllTokens(securityProperties.getCode().getImage().getUrls(), ",");
-        urls.addAll(Arrays.asList(strings));
-        urls.add("/authentication/form");
+        String[] strings = StringUtils.splitByWholeSeparatorPreserveAllTokens(securityProperties.getCode().getSms().getUrls(), ",");
+//        urls.addAll(Arrays.asList(strings)) ;
+        urls.add("/authentication/mobile");
     }
 
     @Override
@@ -64,9 +63,9 @@ public class ValidateCodeFilter extends OncePerRequestFilter implements Initiali
 
     private void validate(HttpServletRequest request) throws ValidateCodeException {
         //session 中的验证码
-        ImageCode imageCode = (ImageCode) request.getSession().getAttribute("captcha_image");
+        ValidateCode imageCode = (ValidateCode) request.getSession().getAttribute("captcha_sms");
         //请求中的验证码
-        String codeInRequest = request.getParameter("imageCode");
+        String codeInRequest = request.getParameter("smsCode");
         if (StringUtils.isBlank(codeInRequest)) {
             throw new ValidateCodeException("验证码的值不能为空");
         }

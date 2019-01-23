@@ -13,19 +13,47 @@
             flex-direction: column;
             align-items: center;
         }
+
+        .icon {
+            width: 3em;
+            height: 3em;
+            vertical-align: -0.15em;
+            fill: currentColor;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
 <div>
-    <h1>自定义登录页面</h1>
+    <h1>用户名密码登录</h1>
     <br>
     <form action="/authentication/form" method="post">
         用户名: <input name="username" type="text"/><br><br>
-        密码<span style="color: white">你</span>: <input name="password" type="password"/><br><br>
+        密码<span style="color: white">你</span>: <input name="password" type="password"/>
+        <input name="remember-me" type="checkbox" value="true"> 记住我 <br><br>
         验证码: <input type="text" name="imageCode"/><br>
         <img src="/code/image"><br>
         <input type="submit" value="登录">
     </form>
+    <br>
+    <h1>短信登录</h1>
+    <br>
+    <form action="/authentication/mobile" method="post">
+        手机号<span style="color: white">你你</span>: <input name="mobile" type="text"/><br><br>
+        短信验证码: <input name="smsCode" type="text"/><a href="/code/sms?mobile=123456789">发送验证码</a><br><br>
+        <input type="submit" value="登录">
+    </form>
+    <br>
+    <div>
+        <h1>QQ登录</h1>
+        <a href="/myLogin/callback.do">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-qq"></use>
+            </svg>
+        </a>
+    </div>
 </div>
 </body>
+<script src="//at.alicdn.com/t/font_1026127_cp80pkeuj8s.js"></script>
+
 </html>

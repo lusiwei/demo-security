@@ -3,14 +3,18 @@ package com.lusiwei.web.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.lusiwei.browser.common.ResponseResult;
 import com.lusiwei.dto.UserQueryCondition;
-import com.lusiwei.exception.UserNotExistException;
 import com.lusiwei.pojo.User;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.ServletWebRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,8 @@ import java.util.List;
  */
 @RestController
 public class UserController {
+    @Autowired
+    private ProviderSignInUtils providerSignInUtils;
     @GetMapping("/user")
     @JsonView(User.SimpleView.class)
     public List<User> query(UserQueryCondition userQueryCondition){
@@ -51,9 +57,15 @@ public class UserController {
         return user;
     }
 
-    @GetMapping("/authentication/form")
-    public ResponseResult loginProcess(){
-        return new ResponseResult("登录成功");
+    @PostMapping("/user/register")
+    public void register(User user, HttpServletRequest request){
+        //注册用户
+        String userId=user.getUsername();
+        providerSignInUtils.doPostSignUp(userId,new ServletWebRequest(request));
+    }
+    @GetMapping("/user/me")
+    public Object getCurrentUser(@AuthenticationPrincipal UserDetails user){
+        return user;
     }
 
 }

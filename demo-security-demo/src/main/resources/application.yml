@@ -1,3 +1,4 @@
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -15,9 +16,19 @@ demo:
     browser:
       loginPage : /demo-login.html
       loginType: JSON
+      signUpUrl: /demo-signup.html
     code:
       image:
         length: 4
         width: 180
         height: 42
-        urls: /user,/user/*
+        urls:
+    social:
+      qq:
+        app-id: 101548936
+        app-secret: 6a97ce44775387a86f59ef6bce172115
+        providerId: callback.do
+      filterProcessUrl: /myLogin
+
+server:
+  port: 80
