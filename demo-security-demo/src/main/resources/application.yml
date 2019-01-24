@@ -5,6 +5,7 @@ spring:
     url: jdbc:mysql:///security
     username: root
     password: 123456
+
   session:
     store-type: none
 security:
@@ -29,6 +30,10 @@ demo:
         app-secret: 6a97ce44775387a86f59ef6bce172115
         providerId: callback.do
       filterProcessUrl: /myLogin
+      wechat:
+        app-id: wx9f1b7cd8c751adc4
+        app-secret: 1722b0013e9cdf1a050f5806fefb4903
+        providerId: wechat
 
 server:
   port: 80

@@ -69,6 +69,7 @@ public class BrowserSecurityController {
         socialUserInfo.setProviderUserId(connectionFromSession.getKey().getProviderUserId());
         socialUserInfo.setNickname(connectionFromSession.getDisplayName());
         socialUserInfo.setHeadimg(connectionFromSession.getImageUrl());
+        logger.info("获取到的providerUserId为"+connectionFromSession.getKey().getProviderUserId());
         return socialUserInfo;
     }
 
